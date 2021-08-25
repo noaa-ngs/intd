@@ -8,7 +8,7 @@ ngs.infocenter@noaa.gov
 Visit:
 https://geodesy.noaa.gov/GEOID/DEFLEC12B/DEFLEC12B_data.shtml
 
-Geoid Grids can be found on the NGS web site under each DEFLEC model.
+Grids can be found on the NGS web site under each DEFLEC model.
 https://geodesy.noaa.gov/GEOID/models.shtml
 
 ## NOAA Open Source Disclaimer
