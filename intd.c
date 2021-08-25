@@ -1,7 +1,7 @@
 // %P%
 // ----- constants ---------------------------------------------------
-static const char PGMVER[]="4.0";
-static const char PGMDAT[]="10/04/2012";
+static const char PGMVER[]="4.2";
+static const char PGMDAT[]="01/22/2015";
        const int  DEBUG = 0;           // diagnostics print if != 0
 static const int  MEM_STEP = 40;       // dynamic allocation increment
 
@@ -224,7 +224,8 @@ int main( const int argc, const char* argv[] ) {
 Which geoid model do you wish to use?\n\n\
    1 = DEFLEC99                 2 = USDOV2009 \n\
    3 = DEFLEC09                 4 = USDOV2012 \n\
-   5 = DEFLEC12A  \n\n\
+   5 = DEFLEC12A  \n\
+   6 = DEFLEC12B  \n\n\
   99 = END PROGRAM\n\n\
    -> ");
         strncpy(cinput, "\0", 42);
@@ -233,7 +234,7 @@ Which geoid model do you wish to use?\n\n\
 
         if (imodel == 99) return(0);
 
-        if (imodel >= 1 && imodel <= 5) {  
+        if (imodel >= 1 && imodel <= 6) {  
             ++iii;
         } else {
             fprintf(stderr,"Error: Not a valid response. Try again.\n");

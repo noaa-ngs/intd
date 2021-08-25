@@ -1,6 +1,6 @@
 // %P%
 // ----- constants ---------------------------------------------------
-static const char SCCSID[]="$Id: run_bbk.c 65868 2012-10-11 16:09:22Z Srinivas.Reddy $	20$Date: 2010/02/17 18:24:48 $ NGS";
+static const char SCCSID[]="$Id: run_bbk.c 82093 2015-01-26 15:26:43Z bruce.tran $	20$Date: 2010/02/17 18:24:48 $ NGS";
 static const int  DEBUG = 0;           // diagnostics print if != 0
 static char final_header1[]= "Basic Statistics: ";
 static char final_header2[]=
@@ -292,6 +292,10 @@ void run_bbk(FILE* ifp, FILE* ofp,
                             else if(imodel == 5) {
                                 strncpy( &card2[20], "DEFLEC12A", 9);
                                 bbcode = 'W';
+                            }
+                            else if(imodel == 6) {
+                                strncpy( &card2[20], "DEFLEC12B", 9);
+                                bbcode = 'X';
                             }
                             card2[62] = bbcode;
                             // strcpy(&card2[30], b33);
