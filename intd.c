@@ -1,7 +1,7 @@
 // %P%
 // ----- constants ---------------------------------------------------
-static const char PGMVER[]="4.2";
-static const char PGMDAT[]="01/22/2015";
+static const char PGMVER[]="4.3";
+static const char PGMDAT[]="05/15/2019";
        const int  DEBUG = 0;           // diagnostics print if != 0
 static const int  MEM_STEP = 40;       // dynamic allocation increment
 
@@ -225,7 +225,8 @@ Which geoid model do you wish to use?\n\n\
    1 = DEFLEC99                 2 = USDOV2009 \n\
    3 = DEFLEC09                 4 = USDOV2012 \n\
    5 = DEFLEC12A  \n\
-   6 = DEFLEC12B  \n\n\
+   6 = DEFLEC12B  \n\
+   7 = DEFLEC18  \n\n\
   99 = END PROGRAM\n\n\
    -> ");
         strncpy(cinput, "\0", 42);
@@ -234,7 +235,7 @@ Which geoid model do you wish to use?\n\n\
 
         if (imodel == 99) return(0);
 
-        if (imodel >= 1 && imodel <= 6) {  
+        if (imodel >= 1 && imodel <= 7) {  
             ++iii;
         } else {
             fprintf(stderr,"Error: Not a valid response. Try again.\n");
@@ -740,8 +741,18 @@ Which longitude convention will you use? \n\
                     ff1out(ofp, vec_data[ii], valx,vale,valh, poseast);
             }
 
-            if (iinput == 1)
-                ff4out(vec_data[ii], valx,vale,valh, poseast);
+            if (iinput == 1){
+                if (imodel == 7){
+                    if (vale == -999.){
+                        printf("\nPoint coordinate outside the area for which the model is valid\n");
+                        printf("If area is Alaska, Hawaii, Guam, American Samoa, or Commonwealth of Northern Marianas Islands please use DEFLEC12B\n");
+                    }else{
+                        ff4out(vec_data[ii], valx,vale,valh, poseast);
+                    }
+                }else{
+                    ff4out(vec_data[ii], valx,vale,valh, poseast);
+                }
+            }
 
         }//~if(xlat == -999. || xlon == -999.)
 

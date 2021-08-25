@@ -60,7 +60,10 @@ int which_defl(double xlat, double xlon, int nfiles, int kk, int imodel,
     ||  imodel == 2       // USDOV2009
     ||  imodel == 3       // DEFLEC09
     ||  imodel == 4       // USDOV2012
-    ||  imodel == 5) {    // DEFLEC12
+    ||  imodel == 5        //DEFLEC12A
+    ||  imodel == 6        //DEFLEC12B
+	||  imodel == 7) {    // DEFLEC18
+	
 
         if (DEBUG != 0) {
             printf("1-In which1 Alaska in model block using kk = %d\n", kk);
@@ -74,8 +77,8 @@ int which_defl(double xlat, double xlon, int nfiles, int kk, int imodel,
             }
 
             for (ii = 0; ii < nfiles; ++ii) {
-                if ( (strcmp("x2012a00.bin", vec_fnames[ii]) == 0) ||
-                     (strcmp("xhg12aa0.bin", vec_fnames[ii]) == 0) 
+                if ( (strcmp("x2012b00.bin", vec_fnames[ii]) == 0) ||
+                     (strcmp("xhg12ba0.bin", vec_fnames[ii]) == 0) 
                    ) {
                     kk = ii;
                     if (DEBUG != 0) {
@@ -88,8 +91,8 @@ int which_defl(double xlat, double xlon, int nfiles, int kk, int imodel,
             for (ii = 0; ii < nfiles; ++ii) {
                 //g++ compiler on the PC does not like strncmp 
                 strcpy(vec_fnames_tmp, vec_fnames[ii]+5);
-                if ( (strncmp("a04.bin", vec_fnames_tmp, 7) == 0) ||
-                     (strncmp("aa4.bin", vec_fnames_tmp, 7) == 0) ) {
+                if ( (strncmp("b04.bin", vec_fnames_tmp, 7) == 0) ||
+                     (strncmp("ba4.bin", vec_fnames_tmp, 7) == 0) ) {
                    kk = ii;
                     if (DEBUG != 0) {
                         printf("In which1 Alaska (2) OK using kk = %d\n",kk);
@@ -98,10 +101,14 @@ int which_defl(double xlat, double xlon, int nfiles, int kk, int imodel,
                 }
             }
 
+/*
+            if ( imodel != 5 || imodel != 6) {
             fprintf(stderr, "Error: In Alaska overlap region.\n");
             fprintf(stderr, "       SouthEast Alaska grid not open.\n");
             fprintf(stderr, "       Get SouthEast Alaska grid.\n");
             abort();
+            }
+*/
         }
     }
 

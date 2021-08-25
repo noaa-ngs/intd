@@ -1,6 +1,6 @@
 // %P%
 // ----- constants ---------------------------------------------------
-static const char SCCSID[]="$Id: getdir_defl.c 81409 2014-12-08 15:45:56Z bruce.tran $	20$Date: 2010/02/22 14:29:39 $ NGS";
+static const char SCCSID[]="$Id: getdir_defl.c 108234 2019-02-28 14:22:09Z bruce.tran $	20$Date: 2010/02/22 14:29:39 $ NGS";
 
 // ----- standard library --------------------------------------------
 #include <stdio.h>
@@ -57,6 +57,9 @@ int getdir_defl(int imodel, char* dirnam) {
         break;
     case 6: 
         strcpy(dirnam, "/ngslib/data/Deflec/Deflec12B/Format_unix/");
+        break;
+    case 7: 
+        strcpy(dirnam, "/ngslib/data/Deflec/Deflec18/Format_unix/");
         break;
 
     default: 

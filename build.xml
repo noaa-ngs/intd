@@ -2,11 +2,13 @@
     <property file="/ngs/projects/database/conf/ngsidb_ant_build.properties"/>
     <property name="exe_name" value="intd"/>
     <property name="exe_name.w" value="${exe_name}.w"/>
+    <property name="pwd" location=""/>
     <property name="destbindir" location="${BLUEBOOKDIR}/bin" />
     <property name="WRAPPER" value="${BLUEBOOKDIR}/scripts/${WRAPPER_SCRIPT}" />
     <property name="build" location="build"/>
     <property name="obj" location="${build}/obj"/>
     <property name="executable" location="${destbindir}/${exe_name.w}"/>
+    <property name="version" value="${version_in}"/>
     <taskdef resource="cpptasks.tasks"/>
 
     <!-- set the operating system test properties -->
@@ -28,7 +30,7 @@
     <target name="c_compile" depends="f_compile" if="isUnix">
         <cc name="cc" subsystem="console" objdir="${obj}" warnings="none">
            <compilerarg value="-g" if="debug" />
-           <compilerarg value="-DSolaris" />
+           <compilerarg value="-DNGS_DB_ORACLE" />
            <fileset dir=".">
              <include name="bb80ll.c" />
              <include name="expform.c" />
@@ -60,7 +62,6 @@
            </fileset>
            <includepath >
              <pathelement location="."/>
-             <pathelement location="${SYBASE_HOME}/include"/>
              <pathelement location="./inclib2"/>
              <pathelement location="./inclib3"/>
            </includepath>
@@ -74,7 +75,6 @@
            <compilerarg value="-fpp" />
            <includepath >
              <pathelement location="."/>
-             <pathelement location="${SYBASE_HOME}/include"/>
              <pathelement location="./inclib2"/>
              <pathelement location="./inclib3"/>
            </includepath>
@@ -85,8 +85,7 @@
        <antcall target="backupapp"/>
        <cc name="f77" outtype="executable" subsystem="console" outfile="${executable}">
          <fileset dir="${obj}" includes="*.o"/>
-         <libset dir="${SYBASE_HOME}/lib" libs="sybdb"/>
-         <libset dir="${USR_HOME}/lib" libs="nsl,m,socket,dl" />
+         <libset dir="${USR_HOME}/lib" libs="nsl,m,dl" />
        </cc>
     </target>
     <target name="linkallwindows" if="isWindows">
@@ -106,6 +105,17 @@
     <echo message="Operating System: ${os.name}" />
    </target>
 
+   <target name="deployweb" depends="deploy,isdev,istest,isprod">
+         <antcall target="copyexe"/>
+         <antcall target="changegroupweb"/>
+         <echo message="intd is deployed" />
+   </target>
+   <target name="deploybetaweb" depends="deploy,isbeta">
+	 <antcall target="copyexe"/>
+         <antcall target="changegroupweb"/>
+         <echo message="intd is deployed" />
+   </target>
+
     <target name="deploy" depends="linkall" if="isUnix">
       <!-- Move executable to deployment directory -->
       <!-- dev server exe is in build directory -->
@@ -117,8 +127,11 @@
             <arg value="${WRAPPER}" />
             <arg value="${destbindir}/${exe_name}" />
          </exec>
+
+         <antcall target="scpdeimos"/>
+
          <antcall target="zip"/>
-         <exec executable="banner" >
+         <exec executable="/ngs/projects/database/scripts/banner" >
             <arg value="${NGS_SERVERENV}" />            
          </exec>
          <echo message="Application deployed to ${destbindir}/${exe_name.w}" />
@@ -132,7 +145,7 @@
          </exec>
     </target>
     <!-- backup the executable only in production environment -->
-    <target name="backupapp" if="isUnix">
+    <target name="backupapp" if="PROD,isUnix">
          <tstamp/>
          <exec executable="mv" >
             <arg value="${destbindir}/${exe_name.w}" />
@@ -216,7 +229,87 @@
            <arg value="intd" />
            <arg value="intd.exe" />
          </exec>
+    </target>
 
+    <target name="copyexe">
+      <echo message="Copy intd.exe to ${CGI_SERVER_LOCAL}: ${PC_PATH}/"/>
+      <exec executable="/bin/sh"  >
+      	  <arg value="-c"/>
+          <arg value="scp ${pwd}/intd.exe ${CGI_SERVER_LOCAL}:${PC_PATH}" />
+      </exec>
+      <exec executable="/bin/sh"  >
+      	  <arg value="-c"/>
+          <arg value="scp ${pwd}/intd.exe ${CGI_SERVER_LOCAL}:${PC_PATH}/intd_v${version}.exe" />
+      </exec>
+      <exec executable="/bin/sh"  >
+      	  <arg value="-c"/>
+          <arg value="scp ${pwd}/intd.zip ${CGI_SERVER_LOCAL}:${PC_PATH}/intd_v${version}.zip" />
+      </exec>
+    </target>
+    <target name="isdev" if="DEV" >
+      <property name="PC_PATH" value="/ngs/projects/web/testweb/htdocs/PC_PROD/GEOIDPGMS" />
+      <property name="CGI_SERVER_LOCAL" value="ngs-vsu-deimos"/>
+      <echo message="dev website location is ${CGI_SERVER_LOCAL}:${PC_PATH}/"/>
+    </target>
+    <target name="istest" if="TEST" >
+      <property name="PC_PATH" value="/ngs/projects/web/testweb/testdocs/PC_PROD/GEOIDPGMS" />
+      <property name="CGI_SERVER_LOCAL" value="ngs-vsu-deimos"/>
+      <echo message="test website location is ${CGI_SERVER_LOCAL}:${PC_PATH}/"/>
+    </target>
+    <target name="isbeta"  >
+      <property name="PC_PATH" value="/ngs/projects/web/testweb/betadocs/PC_PROD/GEOIDPGMS" />
+      <property name="CGI_SERVER_LOCAL" value="deimos"/>
+      <echo message="beta website location is ${CGI_SERVER_LOCAL}:${PC_PATH}/"/>
+      <echo message=" copying ${exe_name.w} to enceladus:${destbindir} " />
+      <exec executable="/bin/ksh"  >
+          <arg value="-c" />
+          <arg value="scp ${executable} enceladus:${destbindir}" />
+      </exec>
+    </target>
+    <target name="isprod" if="PROD" >
+      <property name="PC_PATH" value="/ngs/projects/web/newweb/htdocs/PC_PROD/GEOIDPGMS" />
+      <property name="CGI_SERVER_LOCAL" value="deimos"/>
+      <echo message="prod website location is ${CGI_SERVER_LOCAL}:${PC_PATH}/"/>
+    </target>
+    <target name="changegroupweb">
+      <exec executable="/bin/sh"  >
+         <arg value="-c" />
+         <arg value="ssh ${CGI_SERVER_LOCAL} chgrp -R -f ${RELTEAM_UNXGRP} ${PC_PATH}/*" />
+      </exec>     
+      <echo message="ssh ${CGI_SERVER_LOCAL} chmod -R 775 ${PC_PATH}" />
+      <exec executable="/bin/sh"  >
+          <arg value="-c" />
+          <arg value="ssh ${CGI_SERVER_LOCAL} chmod -R 775 ${PC_PATH}/*" />
+      </exec>        
+    </target>
+    <target name="scpdeimos" if="PROD" >
+      <tstamp/>
+      <echo message=" backup program on ${CGI_SERVER}:${destbindir} " />
+      <exec executable="/bin/ksh"  >
+          <arg value="-c" />
+          <arg value="scp ${CGI_SERVER}:${executable} ${CGI_SERVER}:${destbindir}/backup/${exe_name.w}_${DSTAMP}${TSTAMP}" />
+      </exec>
+      <echo message=" copying ${exe_name.w} to ${CGI_SERVER}:${destbindir} " />
+      <exec executable="/bin/ksh"  >
+          <arg value="-c" />
+          <arg value="ssh ${CGI_SERVER} ln -s ${WRAPPER} ${destbindir}/${exe_name}" />
+      </exec>
+      <exec executable="/bin/ksh"  >
+          <arg value="-c" />
+          <arg value="scp ${executable} ${CGI_SERVER}:${destbindir}" />
+      </exec>
+      <echo message="ssh ${CGI_SERVER} chmod 775 ${destbindir}" />
+      <exec executable="/bin/ksh"  >
+          <arg value="-c" />
+          <arg value="ssh ${CGI_SERVER} chmod 775 ${executable}" />
+      </exec>
+
+      <echo message=" chgrp on ${CGI_SERVER}:${destbindir}" />
+      <exec executable="/bin/ksh"  >
+          <arg value="-c" />
+          <arg value="ssh ${CGI_SERVER} chgrp -f ${RELTEAM_UNXGRP} ${executable}" />
+      </exec>
+      <echo message=" binary deployed to ${CGI_SERVER}:${destbindir}" />
     </target>
 </project>
 

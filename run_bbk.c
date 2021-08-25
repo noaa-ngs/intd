@@ -1,6 +1,6 @@
 // %P%
 // ----- constants ---------------------------------------------------
-static const char SCCSID[]="$Id: run_bbk.c 82093 2015-01-26 15:26:43Z bruce.tran $	20$Date: 2010/02/17 18:24:48 $ NGS";
+static const char SCCSID[]="$Id: run_bbk.c 108316 2019-03-06 20:34:17Z bruce.tran $	20$Date: 2010/02/17 18:24:48 $ NGS";
 static const int  DEBUG = 0;           // diagnostics print if != 0
 static char final_header1[]= "Basic Statistics: ";
 static char final_header2[]=
@@ -297,6 +297,11 @@ void run_bbk(FILE* ifp, FILE* ofp,
                                 strncpy( &card2[20], "DEFLEC12B", 9);
                                 bbcode = 'X';
                             }
+                            else if(imodel == 7) {
+                                strncpy( &card2[20], "DEFLEC18", 8);
+                                bbcode = 'Y';
+                            }
+
                             card2[62] = bbcode;
                             // strcpy(&card2[30], b33);
 
@@ -407,9 +412,17 @@ void run_bbk(FILE* ifp, FILE* ofp,
                                 strcat(card85, "      DEFLEC09");
                                 bbcode = 'E';
                             } 
-                            else if (imodel == 5) {
-                                strcat(card85, "      DEFLEC12");
+                            else if(imodel == 5) {
+                                strncpy( &card2[20], "DEFLEC12A", 9);
                                 bbcode = 'W';
+                            }
+                            else if(imodel == 6) {
+                                strncpy( &card2[20], "DEFLEC12B", 9);
+                                bbcode = 'X';
+                            }
+                            else if(imodel == 7) {
+                                strncpy( &card2[20], "DEFLEC18", 8);
+                                bbcode = 'Y';
                             }
 
                             ixi  = (int)(fabs(valx)*100.0 + 0.5);
@@ -536,10 +549,19 @@ void run_bbk(FILE* ifp, FILE* ofp,
                         strcat(card85, "      DEFLEC09");
                         bbcode = 'E';
                     } 
-                    else if (imodel == 5) {
-                        strcat(card85, "      DEFLEC12");
+                    else if(imodel == 5) {
+                        strncpy( &card2[20], "DEFLEC12A", 9);
                         bbcode = 'W';
                     }
+                    else if(imodel == 6) {
+                        strncpy( &card2[20], "DEFLEC12B", 9);
+                        bbcode = 'X';
+                    }
+                    else if(imodel == 7) {
+                        strncpy( &card2[20], "DEFLEC18", 8);
+                        bbcode = 'Y';
+                    }
+
 
                     ixi  = (int)(fabs(valx)*100.0 + 0.5);
                     ieta = (int)(fabs(vale)*100.0 + 0.5);

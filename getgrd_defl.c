@@ -1,6 +1,6 @@
 // %P%
 // ----- constants ---------------------------------------------------
-static const char SCCSID[]="$Id: getgrd_defl.c 82040 2015-01-22 17:53:15Z bruce.tran $	20$Date: 2010/03/24 15:23:06 $ NGS";
+static const char SCCSID[]="$Id: getgrd_defl.c 108279 2019-03-04 15:47:49Z bruce.tran $	20$Date: 2010/03/24 15:23:06 $ NGS";
 
 // ----- standard library --------------------------------------------
 #include <stdio.h>
@@ -529,8 +529,50 @@ void getgrd_defl(int  imodel, char* dirnam, int is_subr, int* nfiles,
         ii=0;
         sprintf(vec_xfnames[numXiVecFiles++], "%s%s%s%01d%s", dirnam, this_xfname_prefix, as_id, ii, suffix);
         sprintf(vec_efnames[numEtaVecFiles++], "%s%s%s%01d%s", dirnam, this_efname_prefix, as_id, ii, suffix);
+    // -----------------------------------------------------
+    // The DEFLEC18 file names
+    // -----------------------------------------------------
+    } else if (imodel == 7) {
+        *nfiles = 16;   // 16 files of xi, 16 for eta
+        int numXiVecFiles = 0;
+        int numEtaVecFiles = 0;
+
+        FILE* ifp_xconus;
+        FILE* ifp_econus;
+        strncpy(this_xfname_prefix, "\0", sizeof(this_xfname_prefix));
+        strncpy(this_efname_prefix, "\0", sizeof(this_efname_prefix));
+        strcpy(this_xfname_prefix, "xhg18");
+        strcpy(this_efname_prefix, "ehg18");
+
+        // CONUS files
+        ii=0;
+        sprintf(this_xfname, "%s%s%s%01d%s", dirnam, this_xfname_prefix, conus_id, ii, suffix);
+        sprintf(this_efname, "%s%s%s%01d%s", dirnam, this_efname_prefix, conus_id, ii, suffix);
+        if ( ((ifp_xconus = fopen(this_xfname, "rb")) != NULL) &&
+             ((ifp_econus = fopen(this_efname, "rb")) != NULL) ) {
+            *nfiles -= 7;
+            ii=0;
+            sprintf(vec_xfnames[numXiVecFiles++], "%s", this_xfname);
+            sprintf(vec_efnames[numEtaVecFiles++], "%s", this_efname);
+            fclose(ifp_xconus);
+            fclose(ifp_econus);
+        } else {
+           // First 8 files are CONUS -----
+           for (ii = 1; ii <= 8; ++ii) {
+               sprintf(vec_xfnames[numXiVecFiles++], "%s%s%s%01d%s", dirnam, this_xfname_prefix, conus_id, ii, suffix);
+               sprintf(vec_efnames[numEtaVecFiles++], "%s%s%s%01d%s", dirnam, this_efname_prefix, conus_id, ii, suffix);
+           }
+        }
+
+        *nfiles -= 7;
+
+        // Next 1 file is PR/VI -----
+        ii=0;
+        sprintf(vec_xfnames[numXiVecFiles++], "%s%s%s%01d%s", dirnam, this_xfname_prefix, pr_id, ii, suffix);
+        sprintf(vec_efnames[numEtaVecFiles++], "%s%s%s%01d%s", dirnam, this_efname_prefix, pr_id, ii, suffix);
 
     }//~if(imodel)
+ 
 
     // -----------------------------------------------------
     // Now open all the files
