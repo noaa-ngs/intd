@@ -2,7 +2,7 @@
     <property file="/ngs/projects/database/conf/ngsidb_ant_build.properties"/>
     <property name="exe_name" value="intd"/>
     <property name="exe_name.w" value="${exe_name}.w"/>
-    <property name="pwd" location=""/>
+    <property name="cwd" location=""/>
     <property name="destbindir" location="${BLUEBOOKDIR}/bin" />
     <property name="WRAPPER" value="${BLUEBOOKDIR}/scripts/${WRAPPER_SCRIPT}" />
     <property name="build" location="build"/>
@@ -118,7 +118,7 @@
 
     <target name="deploy" depends="linkall" if="isUnix">
       <!-- Move executable to deployment directory -->
-      <!-- dev server exe is in build directory -->
+      <!-- dev exe is in build directory -->
       <!-- test/prod exe is moved to /ngs/projects/bluebook/bin -->
          <chmod file="${executable}" perm="775" />
          <antcall target="changegroup"/>
@@ -235,15 +235,15 @@
       <echo message="Copy intd.exe to ${CGI_SERVER_LOCAL}: ${PC_PATH}/"/>
       <exec executable="/bin/sh"  >
       	  <arg value="-c"/>
-          <arg value="scp ${pwd}/intd.exe ${CGI_SERVER_LOCAL}:${PC_PATH}" />
+          <arg value="scp ${cwd}/intd.exe ${CGI_SERVER_LOCAL}:${PC_PATH}" />
       </exec>
       <exec executable="/bin/sh"  >
       	  <arg value="-c"/>
-          <arg value="scp ${pwd}/intd.exe ${CGI_SERVER_LOCAL}:${PC_PATH}/intd_v${version}.exe" />
+          <arg value="scp ${cwd}/intd.exe ${CGI_SERVER_LOCAL}:${PC_PATH}/intd_v${version}.exe" />
       </exec>
       <exec executable="/bin/sh"  >
       	  <arg value="-c"/>
-          <arg value="scp ${pwd}/intd.zip ${CGI_SERVER_LOCAL}:${PC_PATH}/intd_v${version}.zip" />
+          <arg value="scp ${cwd}/intd.zip ${CGI_SERVER_LOCAL}:${PC_PATH}/intd_v${version}.zip" />
       </exec>
     </target>
     <target name="isdev" if="DEV" >
